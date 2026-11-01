@@ -14,6 +14,7 @@ syms = {l.split()[2]: int(l.split()[0], 16) for l in
         subprocess.check_output([NM, 'firmware_ext/build/extension.elf'], text=True).splitlines() if len(l.split()) == 3}
 
 flash = bytearray(0x80000)
+HAS_PAYLOAD = False
 
 # Load flash from available build artifact
 for s19_path in ['DSO-TC3_custom-ext.s19', 'firmware_ext/build/DSO-TC3_custom-ext.s19', 'firmware/custom-builds/DSO-TC3_custom-ext.s19']:
@@ -22,12 +23,14 @@ for s19_path in ['DSO-TC3_custom-ext.s19', 'firmware_ext/build/DSO-TC3_custom-ex
         key = s19_data[0] ^ s19_data[1] ^ s19_data[0x1E] ^ s19_data[0x1F]
         payload = bytes(b ^ key for b in s19_data[0x40:])
         flash[0x4000:0x4000 + len(payload)] = payload
+        HAS_PAYLOAD = True
         break
 else:
     for bin_path in ['DSO-TC3_custom-ext.flash.bin', 'firmware/custom-builds/DSO-TC3_custom-ext.flash.bin']:
         if os.path.exists(bin_path):
             payload = open(bin_path, 'rb').read()[0x20:]
             flash[0x4000:0x4000 + len(payload)] = payload
+            HAS_PAYLOAD = True
             break
 
 # If extension.bin is built, ensure it is in place

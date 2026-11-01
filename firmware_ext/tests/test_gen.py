@@ -6,10 +6,14 @@ and lets the STOCK generator routine (0x08005da0) run for real, then checks the
 RAM settings and the DAC table it builds at 0x20000bfc.
 usage: firmware_ext/tests/test_gen.py
 """
-import math, struct
+import math, struct, sys
 import harness as H
 from unicorn.arm_const import *
 from harness import flash, sram, u32, syms, UC_ARM_REG_R0, UC_ARM_REG_R1   # also: fresh(stubs), run, w32, dispatch
+
+if not H.HAS_PAYLOAD:
+    print("SKIP test_gen: DSO-TC3_custom-ext.s19 not found (build custom firmware first)")
+    sys.exit(0)
 
 STUBS = {0x08007cb0: 'key_consumer', 0x08012f48: 'screen_update'}   # everything else runs for real
 TABLE = 0x20000bfc

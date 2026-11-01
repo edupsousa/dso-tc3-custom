@@ -6,7 +6,9 @@ from functools import lru_cache
 
 PROBE_MULT = (1, 10)
 GAIN_BY_VDIV = [1, 1, 2, 4, 5, 48, 48, 96, 240, 480]
-_CAL_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scope_cal.json")
+_PKG_CAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scope_cal.json")
+_TREE_CAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scope_cal.json")
+_CAL_FILE = _PKG_CAL if os.path.exists(_PKG_CAL) else _TREE_CAL
 _CAL = None
 
 

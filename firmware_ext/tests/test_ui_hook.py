@@ -9,7 +9,11 @@ the stock `adjust()` at 0x080116b0 runs for real.
 usage: firmware_ext/tests/test_ui_hook.py
 """
 import struct, sys
-from harness import *   # fresh(stubs), run, u32, w32, dispatch, syms
+from harness import *   # fresh(stubs), run, u32, w32, dispatch, syms, HAS_PAYLOAD
+
+if not HAS_PAYLOAD:
+    print("SKIP test_ui_hook: DSO-TC3_custom-ext.s19 not found (build custom firmware first)")
+    sys.exit(0)
 
 STUBS = {0x08011df0: 'refresh_vdiv', 0x08011ea8: 'refresh_tdiv', 0x08011f58: 'refresh_trig',
          0x08011b04: 'refresh_pos', 0x08011a50: 'refresh_coupling', 0x08012038: 'refresh_edge',

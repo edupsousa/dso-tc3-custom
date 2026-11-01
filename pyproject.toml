@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dso-tc3"
+version = "1.1.0"
+description = "Host tools, client library, and SCPI server for the FNIRSI DSO-TC3 oscilloscope"
+readme = "docs/host-tools.md"
+requires-python = ">=3.8"
+license = "GPL-3.0-or-later"
+authors = [
+    {name = "Eduardo P de Sousa"},
+]
+keywords = ["oscilloscope", "fnirsi", "dso-tc3", "scpi", "sigrok", "firmware"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "pyserial>=3.5",
+]
+
+[project.optional-dependencies]
+visa = [
+    "pyvisa>=1.13.0",
+    "pyvisa-py>=0.7.0",
+]
+firmware = [
+    "keystone-engine>=0.9.2",
+    "unicorn>=2.0.0",
+]
+test = [
+    "pyvisa>=1.13.0",
+    "pyvisa-py>=0.7.0",
+]
+
+[project.scripts]
+tc3 = "tc3.cli:main"
+tc3-client = "tc3.cli:main"
+tc3-scpi = "tc3scpi:main"
+tc3-sr = "tc3_sr:main"
+tc3-cal = "tc3_cal:main"
+tc3-shots = "tc3_shots:main"
+
+[tool.setuptools]
+package-dir = {"" = "host"}
+py-modules = ["tc3_client", "tc3_scpi", "tc3_sr", "tc3_cal", "tc3_shots"]
+
+[tool.setuptools.packages.find]
+where = ["host"]
+include = ["tc3*", "tc3scpi*"]
+
+[tool.setuptools.package-data]
+tc3 = ["scope_cal.json"]

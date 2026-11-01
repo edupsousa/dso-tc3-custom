@@ -5,6 +5,8 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+.venv/
+uv.lock
 
 # firmware_ext build output (regenerate with `make` in firmware_ext/)
 firmware_ext/build/

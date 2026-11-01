@@ -1,0 +1,71 @@
+{
+ "about": "Per V/div index correction of the stock volts conversion: scope_volts = k * true_volts + b, so true = (scope - b) / k. Measured 2026-10-31 on one unit with host/tc3_cal.py against the generator DC output, whose own line (true = 0.992 * setting - 0.008 V) came from two multimeter readings (3.0 V -> 2.968 V, 1.0 V -> 0.984 V). x10: probe switch and scope selector both X10 (indices 0..6; 7..9 cannot be driven by the 3.3 V generator). x1: both X1 (indices 3..9; 0..2 are too small for the generator line's accuracy). The X10 gain error (about 3 %) is the probe plus input divider (about 10.3:1), the X1 gain is within 1 %: the numbers belong to this probe. Set TC3_CAL=0 to disable.",
+ "generator": {
+  "gain": 0.992,
+  "offset": -0.008
+ },
+ "x10": {
+  "ranges": {
+   "0": {
+    "k": 0.9401,
+    "b": 0.005
+   },
+   "1": {
+    "k": 0.9707,
+    "b": -0.0004
+   },
+   "2": {
+    "k": 0.9606,
+    "b": -0.0047
+   },
+   "3": {
+    "k": 0.9669,
+    "b": -0.029
+   },
+   "4": {
+    "k": 0.9691,
+    "b": -0.0356
+   },
+   "5": {
+    "k": 0.9822,
+    "b": 0.0531
+   },
+   "6": {
+    "k": 0.9781,
+    "b": 0.0612
+   }
+  }
+ },
+ "x1": {
+  "ranges": {
+   "3": {
+    "k": 1.0026,
+    "b": 0.0061
+   },
+   "4": {
+    "k": 1.0034,
+    "b": 0.0051
+   },
+   "5": {
+    "k": 1.0067,
+    "b": 0.0156
+   },
+   "6": {
+    "k": 1.0061,
+    "b": 0.016
+   },
+   "7": {
+    "k": 1.0057,
+    "b": -0.027
+   },
+   "8": {
+    "k": 1.0102,
+    "b": -0.1644
+   },
+   "9": {
+    "k": 1.0238,
+    "b": -0.4217
+   }
+  }
+ }
+}
