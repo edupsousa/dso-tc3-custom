@@ -17,7 +17,13 @@ flash = bytearray(0x80000)
 HAS_PAYLOAD = False
 
 # Load flash from available build artifact
-for s19_path in ['DSO-TC3_custom-ext.s19', 'firmware_ext/build/DSO-TC3_custom-ext.s19', 'firmware/custom-builds/DSO-TC3_custom-ext.s19']:
+SEARCH_S19 = [
+    'DSO-TC3_custom-ext.s19',
+    'firmware_ext/build/DSO-TC3_custom-ext.s19',
+    'firmware/custom-builds/DSO-TC3_custom-ext.s19',
+]
+
+for s19_path in SEARCH_S19:
     if os.path.exists(s19_path):
         s19_data = open(s19_path, 'rb').read()
         key = s19_data[0] ^ s19_data[1] ^ s19_data[0x1E] ^ s19_data[0x1F]

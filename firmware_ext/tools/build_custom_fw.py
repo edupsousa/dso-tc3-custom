@@ -157,12 +157,29 @@ def apply_hooks(data):
         print(f"  - {hook['what']}: payload offset 0x{off:x} -> {target}")
 
 
+def resolve_stock(stock_path=None):
+    if stock_path and os.path.isfile(stock_path):
+        return stock_path
+    candidates = [
+        "DSO-TC3_V0.3.s19",
+        "firmware_ext/DSO-TC3_V0.3.s19",
+        "firmware_ext/stock/DSO-TC3_V0.3.s19",
+        "stock/DSO-TC3_V0.3.s19",
+        "../DSO-TC3_V0.3.s19",
+    ]
+    for c in candidates:
+        if os.path.isfile(c):
+            return c
+    return None
+
+
 def assemble_payload(base_payload=None, stock_s19=None, out_bin=None):
     out_bin = out_bin or DEFAULT_OUT_FLASH_BIN
     print("[2/4] Assembling multi-segment payload...")
-    if stock_s19 and os.path.isfile(stock_s19):
-        print(f"  - Unpacking and applying gate stub to stock firmware: {stock_s19}")
-        stock_bytes = open(stock_s19, "rb").read()
+    resolved_stock = resolve_stock(stock_s19)
+    if resolved_stock:
+        print(f"  - Unpacking and applying gate stub to stock firmware: {resolved_stock}")
+        stock_bytes = open(resolved_stock, "rb").read()
         hdr = stock_bytes[:0x20]
         key = hdr[0] ^ hdr[1] ^ hdr[0x1E] ^ hdr[0x1F]
         data = bytearray(b ^ key for b in stock_bytes[0x20:])
@@ -175,7 +192,8 @@ def assemble_payload(base_payload=None, stock_s19=None, out_bin=None):
     else:
         raise FileNotFoundError(
             "Neither a valid stock firmware (.s19) nor base payload was found.\n"
-            "Provide --stock <path_to_DSO-TC3_V0.3.s19> or place DSO-TC3_V0.3.s19 in the current directory."
+            "Run `python3 firmware_ext/tools/fetch_stock_fw.py` to download it directly from FNIRSI,\n"
+            "or provide --stock <path_to_DSO-TC3_V0.3.s19>."
         )
 
     apply_hooks(data)
@@ -252,10 +270,11 @@ def main(argv=None):
         global _nm_path
         _nm_path = args.nm
 
+    resolved_stock = resolve_stock(args.stock)
     build_extension()
-    payload = assemble_payload(base_payload=args.base, stock_s19=args.stock, out_bin=args.payload)
+    payload = assemble_payload(base_payload=args.base, stock_s19=resolved_stock, out_bin=args.payload)
     repack_s19(payload, out_s19=args.out)
-    verify_s19(out_s19=args.out, stock_s19=args.stock)
+    verify_s19(out_s19=args.out, stock_s19=resolved_stock)
 
 
 if __name__ == "__main__":

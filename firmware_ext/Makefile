@@ -41,4 +41,10 @@ build:
 clean:
 	rm -rf build
 
-.PHONY: all clean
+fetch-stock:
+	python3 tools/fetch_stock_fw.py
+
+custom-fw: all
+	python3 tools/build_custom_fw.py
+
+.PHONY: all clean fetch-stock custom-fw
