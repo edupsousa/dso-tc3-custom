@@ -8,6 +8,8 @@ build/
 
 # firmware_ext build output (regenerate with `make` in firmware_ext/)
 firmware_ext/build/
+*.flash.bin
+*.s19
 
 # Toolchain local symlinks
 firmware_ext/tools/toolchain/
