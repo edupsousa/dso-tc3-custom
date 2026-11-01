@@ -1,0 +1,74 @@
+--- a/pv/binding/device.cpp	2026-10-31 16:49:10.615307669 -0300
++++ b/pv/binding/device.cpp	2026-10-31 17:49:09.530962575 -0300
+@@ -24,6 +24,7 @@
+ #include "device.hpp"
+ 
+ #include <pv/prop/bool.hpp>
++#include <pv/prop/double.hpp>
+ #include <pv/prop/enum.hpp>
+ #include <pv/prop/int.hpp>
+ 
+@@ -44,6 +45,7 @@
+ using sigrok::Error;
+ 
+ using pv::prop::Bool;
++using pv::prop::Double;
+ using pv::prop::Enum;
+ using pv::prop::Int;
+ using pv::prop::Property;
+@@ -107,6 +109,25 @@
+ 				tr("No Limit"));
+ 			break;
+ 
++		case SR_CONF_OUTPUT_FREQUENCY:
++			// Signal generator (fnirsi-dso-tc3): the driver lists the range as (min, max, step)
++			bind_gen_double(descr, 0, " Hz", 1.0, 100000.0, 1.0, get, set);
++			break;
++
++		case SR_CONF_AMPLITUDE:
++			bind_gen_double(descr, 2, " V", 0.01, 3.3, 0.01, get, set);
++			break;
++
++		case SR_CONF_DUTY_CYCLE:
++			bind_gen_double(descr, 0, " %", 0.0, 100.0, 1.0, get, set);
++			break;
++
++		case SR_CONF_TRIGGER_LEVEL:
++			// Analog trigger level in volts (fnirsi-dso-tc3; the driver clamps to the device's range)
++			bind_gen_double(descr, 2, " V", -60.0, 60.0, 0.05, get, set);
++			break;
++
++		case SR_CONF_TRIGGER_MODE:   // fnirsi-dso-tc3: auto, normal, single (a key its patched libsigrok adds)
+ 		case SR_CONF_PATTERN_MODE:
+ 		case SR_CONF_BUFFERSIZE:
+ 		case SR_CONF_TRIGGER_SOURCE:
+@@ -204,6 +225,16 @@
+ 		range, getter, setter, special_value_text)));
+ }
+ 
++void Device::bind_gen_double(const QString &name, int decimals, QString suffix,
++	double min, double max, double step,
++	Property::Getter getter, Property::Setter setter)
++{
++	assert(configurable_);
++
++	properties_.push_back(shared_ptr<Property>(new Double(name, "", decimals,
++		suffix, pair<double, double>(min, max), step, getter, setter)));
++}
++
+ QString Device::print_timebase(Glib::VariantBase gvar)
+ {
+ 	uint64_t p, q;
+--- a/pv/binding/device.hpp	2026-10-31 16:49:10.698162643 -0300
++++ b/pv/binding/device.hpp	2026-10-31 16:49:10.766105922 -0300
+@@ -65,6 +65,10 @@
+ 		prop::Property::Getter getter, prop::Property::Setter setter,
+ 		QString special_value_text = "");
+ 
++	void bind_gen_double(const QString &name, int decimals, QString suffix,
++		double min, double max, double step,
++		prop::Property::Getter getter, prop::Property::Setter setter);
++
+ 	static QString print_timebase(Glib::VariantBase gvar);
+ 	static QString print_vdiv(Glib::VariantBase gvar);
+ 	static QString print_voltage_threshold(Glib::VariantBase gvar);
