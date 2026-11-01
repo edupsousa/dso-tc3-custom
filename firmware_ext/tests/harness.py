@@ -8,7 +8,8 @@ import subprocess
 from unicorn import *
 from unicorn.arm_const import *
 
-NM = shutil.which('arm-none-eabi-nm') or 'firmware_ext/tools/toolchain/bin/arm-none-eabi-nm'
+local_nm = 'firmware_ext/tools/toolchain/bin/arm-none-eabi-nm'
+NM = local_nm if (os.path.isfile(local_nm) and os.access(local_nm, os.X_OK)) else (shutil.which('arm-none-eabi-nm') or 'arm-none-eabi-nm')
 syms = {l.split()[2]: int(l.split()[0], 16) for l in
         subprocess.check_output([NM, 'firmware_ext/build/extension.elf'], text=True).splitlines() if len(l.split()) == 3}
 
