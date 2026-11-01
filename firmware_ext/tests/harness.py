@@ -3,6 +3,7 @@ Run tests from the repository root.
 
 Optional environment, for a richer emulated device than the defaults:
   TC3_FLASH_BASE     full 512 KB flash dump to start from (default: blank flash)
+  TC3_CUSTOM_IMAGE   built update file (.s19) to load, tried before the default locations
   TC3_SRAM_SNAPSHOT  128 KB SRAM snapshot of a running scope (default: a minimal synthetic state)"""
 import os
 import shutil
@@ -21,7 +22,7 @@ flash = bytearray(open(os.environ['TC3_FLASH_BASE'], 'rb').read() if os.environ.
 HAS_PAYLOAD = False
 
 # Load flash from available build artifact
-SEARCH_S19 = [
+SEARCH_S19 = ([os.environ['TC3_CUSTOM_IMAGE']] if os.environ.get('TC3_CUSTOM_IMAGE') else []) + [
     'DSO-TC3_custom-ext.s19',
     'firmware_ext/build/DSO-TC3_custom-ext.s19',
     'firmware/custom-builds/DSO-TC3_custom-ext.s19',
