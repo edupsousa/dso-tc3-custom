@@ -160,6 +160,7 @@ uint32_t extension_ui_hook(uint32_t *arg) {
     ext_init();
     screen_hook_step();
     gen_hook_step();
+    cfg_hook_step();
     ui_hook_step();
     return stock_key_consumer(arg);
 }

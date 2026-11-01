@@ -70,6 +70,8 @@ PROVIDE(stock_obj_invalidate = 0x08027d68 | 1); /* lv_obj_invalidate(obj) */
 PROVIDE(stock_adc_isr = 0x08004a4c | 1);
 
 /* Signal generator: (float amp in s0, wave r0, freq r1, duty r2); builds the DAC table and starts DAC DMA / TIM8 PWM */
+/* Config save: erases the sector 0x0807F000 and programs the first 0x90 bytes of g_ScopeState */
+PROVIDE(stock_cfg_save = 0x08019468 | 1);
 PROVIDE(stock_gen_apply = 0x08005da0 | 1);
 /* Generator screen update (build, delta): wave += delta with label recolor and selector strip, then the value labels,
  * row visibility, preview line points (0x2000155c) and FUN_08005da0. Called with delta 0 it only refreshes. */

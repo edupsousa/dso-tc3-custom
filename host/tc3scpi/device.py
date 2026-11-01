@@ -111,7 +111,7 @@ class Device:
                 raise DeviceError(-230, f"no roll data: {e}")
 
     def read_u32(self, addr):
-        """One 32-bit word of device memory (gate stub 0x42)."""
+        """One 32-bit word of device memory (extension 0x42)."""
         with self.lock:
             try:
                 return struct.unpack("<I", T.read_mem(self.ser, addr, 4))[0]

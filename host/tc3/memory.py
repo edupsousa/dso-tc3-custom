@@ -1,4 +1,4 @@
-"""Device memory through the 0x42 gate stub."""
+"""Device memory through the extension (0x42)."""
 import struct
 
 from .link import request, Tc3Error

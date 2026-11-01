@@ -12,6 +12,7 @@ extern void stock_console_dispatch(uint8_t *req, uint32_t len);
 extern void stock_apply_vdiv_gain(void);
 
 /* UI layer: stock routines called from the main-loop hook */
+extern void stock_cfg_save(void);
 extern void stock_ui_adjust(int32_t delta);
 extern void stock_refresh_runstop(int32_t create);
 extern void stock_widget_show(uint32_t widget, uint32_t flags);

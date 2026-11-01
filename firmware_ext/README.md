@@ -6,7 +6,7 @@ a few patched instructions (`HOOKS` in `firmware_ext/tools/build_custom_fw.py`).
 
 | File | Job | Entry points (patched into the stock image) |
 |---|---|---|
-| `src/main.c` | command dispatch, `0x5F` info, one-time RAM init | `extension_dispatch` (gate-stub trampoline) |
+| `src/main.c` | command dispatch, `0x5F` info, one-time RAM init | `extension_dispatch` (USB console call hook) |
 | `src/usb.c` | send one CDC packet without calling stock code | |
 | `src/params.c` | legacy `0x50` snapshot, `0x51`/`0x52` raw get/set | |
 | `src/frames.c` | 8-slot ring of 600-sample bursts, `0x54` | `extension_dma_isr` (DMA1_CH1 vector), `extension_wait_hook` (T/div 0..2) |

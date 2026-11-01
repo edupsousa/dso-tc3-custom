@@ -13,7 +13,7 @@ fw = values(os.path.join(here, "..", "..", "firmware_ext", "include", "protocol.
 
 # wire.py name -> firmware name
 SCALARS = {n: n for n in ("CMD_READ_MEM", "CMD_SNAP", "CMD_GET_PARAM", "CMD_SET_PARAM", "CMD_FRAME", "CMD_UI", "CMD_SCREEN", "CMD_ROLL",
-                          "CMD_GEN", "CMD_EXT_INFO", "RESP_READ_MEM", "RESP_ERROR", "ERR_BAD_CHUNK", "ERR_NO_FRAME", "ERR_EMPTY",
+                          "CMD_GEN", "CMD_CFG", "CMD_EXT_INFO", "RESP_READ_MEM", "RESP_ERROR", "ERR_BAD_CHUNK", "ERR_NO_FRAME", "ERR_EMPTY",
                           "GEN_GET", "GEN_SET", "GEN_LOG", "UI_KEY")}
 SCALARS.update({"HEADER": "UI_POLL", "ACTION_DONE": "UI_DONE"})
 for mine, theirs in SCALARS.items():

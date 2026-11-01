@@ -9,7 +9,7 @@
 #define EXTENSION_BANNER        "TC3-EXT:v1.1.0"   /* 0x5F reply: 3 version bytes, then this text (at most 24 characters) */
 
 /* Command IDs */
-#define CMD_READ_MEM    0x42  /* Handled by gate stub / extension (0x42 | addr LE32 | n LE16 -> 0x43 | n bytes) */
+#define CMD_READ_MEM    0x42  /* Handled by the extension (0x42 | addr LE32 | n LE16 -> 0x43 | n bytes) */
 #define CMD_SNAP        0x50  /* Frame snapshot (F1) */
 #define CMD_GET_PARAM   0x51  /* Read scope state parameters (F2) */
 #define CMD_SET_PARAM   0x52  /* Write scope state parameters (F2) */
@@ -18,6 +18,7 @@
 #define CMD_UI          0x55  /* Deferred UI action (main-loop hook): 0x55 | field | value LE32; field 0xFF = poll */
 #define CMD_SCREEN      0x56  /* Screen capture control: 0x56 | op [| arg] (see handle_screen) */
 #define CMD_GEN         0x58  /* Signal generator: 0x58 0x00 = get, 0x58 0x01 | wave | freq LE32 | duty | amp float32 LE = set */
+#define CMD_CFG         0x59  /* M-Tester calibration write: 0x59 | flags | 7 x float32 LE; 0x59 0xFF = poll */
 #define CMD_EXT_INFO    0x5F  /* Extension query / ping */
 
 /* Response Tags */
@@ -30,6 +31,7 @@
 #define RESP_UI         0x55
 #define RESP_SCREEN     0x56
 #define RESP_GEN        0x58
+#define RESP_CFG        0x59
 #define RESP_EXT_INFO   0x5F
 #define RESP_ERROR      0x7E
 

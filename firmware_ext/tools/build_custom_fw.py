@@ -2,9 +2,9 @@
 """Build and repack the DSO-TC3 Custom Firmware with Phase 2 Extension.
 
 Combines:
-  1. Base dump-firmware (stock + gate stub at 0x0800f490)
+  1. Base: the untouched vendor image, unpacked from the official stock .s19
   2. The hooks listed in HOOKS below, each checked against the stock bytes it replaces
-     (vector entries, `bl` call sites, the trampoline into extension_dispatch)
+     (vector entries, `bl` call sites, the console call into extension_dispatch)
   3. Padding (0xFF) up to 0x0805E000
   4. Extension binary compiled from firmware_ext/
   5. Repacks into .s19 update file with valid header and XOR encryption
@@ -34,11 +34,6 @@ FLASH_EXT_START = 0x0805E000
 FLASH_EXT_SIZE = 0x20000
 MAX_FLASH_END   = 0x0807F000          # Configuration sector (calibration) boundary
 PAYLOAD_HEADER = 0x20                 # the payload file starts 0x20 bytes before FLASH_APP_START
-
-GATE_STUB_BYTES = bytes.fromhex(
-    "70b50278422a23d1072921d3432202704378827843ea0223c27843ea0243027943ea02644679827956ea0226"
-    "06b901263c2e00d93c26421c35462378137001340132013df9d1711cbde87040f5f73cbebde8704004f010bd"
-)
 
 _ks = keystone.Ks(keystone.KS_ARCH_ARM, keystone.KS_MODE_THUMB)
 _nm_path = None
@@ -75,7 +70,7 @@ def bl(target, at):
 #   kind "vector": an interrupt vector entry (a word) now points at the extension symbol
 #   kind "call":   a `bl stock_target` now calls the extension symbol, which wraps the stock routine
 #   kind "nop":    a call is removed
-#   kind "branch": the gate-stub trampoline `b.w` to the extension entry
+#   kind "branch": a `b.w` to an extension symbol
 def _vector(name, addr, stock, symbol, what):
     return dict(kind="vector", name=name, addr=addr, stock=stock.to_bytes(4, "little"), symbol=symbol, what=what)
 
@@ -85,9 +80,10 @@ def _call(name, addr, stock_target, symbol, what):
 
 
 HOOKS = [
-    # b.w 0x08013f08 (stock console dispatch) -> extension_dispatch; other commands are forwarded back to it
-    dict(kind="branch", name="trampoline", addr=0x0800F4E4, stock=bytes.fromhex("04f010bd"),
-         symbol="extension_dispatch", what="gate-stub trampoline"),
+    # The USB receive callback's call of the stock console (bl 0x08013f08) goes to extension_dispatch, which answers 0x42
+    # and its own commands and forwards the rest to the stock console. Nothing else of the stock image is overwritten:
+    # an earlier "gate stub" at 0x0800F490 destroyed the live M-Tester screen routine.
+    _call("console", 0x080075FC, 0x08013F08, "extension_dispatch", "USB console call"),
     # DMA1_CH1 (IRQ 11, vector 27, app offset 0x6C): the stock handler 0x08005980 clears TC and sets the burst flag;
     # the extension ISR does the same and ring-stores the burst.
     _vector("dma", payload_offset(0x0800406C), 0x08005981, "extension_dma_isr", "DMA1_CH1 vector"),
@@ -178,14 +174,11 @@ def assemble_payload(base_payload=None, stock_s19=None, out_bin=None):
     print("[2/4] Assembling multi-segment payload...")
     resolved_stock = resolve_stock(stock_s19)
     if resolved_stock:
-        print(f"  - Unpacking and applying gate stub to stock firmware: {resolved_stock}")
+        print(f"  - Unpacking the stock firmware: {resolved_stock}")
         stock_bytes = open(resolved_stock, "rb").read()
         hdr = stock_bytes[:0x20]
         key = hdr[0] ^ hdr[1] ^ hdr[0x1E] ^ hdr[0x1F]
         data = bytearray(b ^ key for b in stock_bytes[0x20:])
-        # Retarget console caller at 0x361c to 0x0800f490, and place gate stub at 0xb4b0
-        data[0x361c:0x3620] = bytes.fromhex("07f048ff")
-        data[0xb4b0:0xb4b0 + len(GATE_STUB_BYTES)] = GATE_STUB_BYTES
     elif base_payload and os.path.isfile(base_payload):
         print(f"  - Using base payload: {base_payload}")
         data = bytearray(open(base_payload, "rb").read())
@@ -258,7 +251,7 @@ def main(argv=None):
     ap.add_argument("--stock", default="DSO-TC3_V0.3.s19",
                     help="path to official stock firmware (default: DSO-TC3_V0.3.s19)")
     ap.add_argument("--base", default=None,
-                    help="path to base dump-firmware flash binary if already unpacked")
+                    help="path to an already unpacked, untouched stock flash binary")
     ap.add_argument("-o", "--out", default=DEFAULT_OUT_S19,
                     help=f"output .s19 filename (default: {DEFAULT_OUT_S19})")
     ap.add_argument("--payload", default=DEFAULT_OUT_FLASH_BIN,

@@ -68,10 +68,12 @@ bool handle_roll(const uint8_t *req, uint32_t len);                  /* 0x57 */
 bool handle_ui(const uint8_t *req, uint32_t len);                    /* 0x55 */
 bool handle_screen(const uint8_t *req, uint32_t len);                /* 0x56 */
 bool handle_gen(const uint8_t *req, uint32_t len);                   /* 0x58 */
+bool handle_cfg(const uint8_t *req, uint32_t len);                   /* 0x59 */
 
 /* ---- main-loop steps run by extension_ui_hook, in this order ---- */
 void screen_hook_step(void);
 void gen_hook_step(void);
+void cfg_hook_step(void);
 void ui_hook_step(void);
 
 /* ---- generator module entry points used by assembly stubs ---- */

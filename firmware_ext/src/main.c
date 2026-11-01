@@ -1,5 +1,5 @@
 /*
- * Extension entry point and command dispatch. The gate stub's trampoline (firmware_ext/tools/build_custom_fw.py) jumps to
+ * Extension entry point and command dispatch. The USB console call (hook in firmware_ext/tools/build_custom_fw.py) jumps to
  * extension_dispatch for every console command the stock USB handler receives. Commands we do not own are passed
  * back to the stock console (0x08013f08) unchanged.
  *
@@ -37,6 +37,19 @@ static void handle_ext_info(void) {
     ext_reply(4 + len);
 }
 
+/* 0x42 | addr LE32 | n LE16 -> 0x43 | n bytes (1..60). Needs 7 request bytes; anything shorter goes to the stock console. */
+#define READ_MEM_MAX 60
+static bool handle_read_mem(const uint8_t *req, uint32_t len) {
+    if (len < 7) return false;
+    uint32_t addr = get_u32(&req[1]);
+    uint32_t n = req[5] | ((uint32_t)req[6] << 8);
+    if (n == 0 || n > READ_MEM_MAX) n = n ? READ_MEM_MAX : 1;
+    s_resp_buf[0] = RESP_READ_MEM;
+    for (uint32_t i = 0; i < n; i++) s_resp_buf[1 + i] = ((const volatile uint8_t *)addr)[i];
+    ext_reply(1 + n);
+    return true;
+}
+
 /* Extension entry point placed at 0x0805E000 */
 __attribute__((section(".text.entry"), used))
 void extension_dispatch(uint8_t *req, uint32_t len) {
@@ -48,6 +61,7 @@ void extension_dispatch(uint8_t *req, uint32_t len) {
 
     bool handled = true;
     switch (req[0]) {
+    case CMD_READ_MEM:  handled = handle_read_mem(req, len); break;
     case CMD_EXT_INFO:  handle_ext_info(); break;
     case CMD_SNAP:
     case CMD_GET_PARAM:
@@ -57,6 +71,7 @@ void extension_dispatch(uint8_t *req, uint32_t len) {
     case CMD_UI:        handled = handle_ui(req, len); break;
     case CMD_SCREEN:    handled = handle_screen(req, len); break;
     case CMD_GEN:       handled = handle_gen(req, len); break;
+    case CMD_CFG:       handled = handle_cfg(req, len); break;
     default:            handled = false; break;   /* stock commands (0x00, 0x10, ...) */
     }
     if (!handled) {

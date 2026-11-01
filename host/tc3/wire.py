@@ -11,6 +11,7 @@ CMD_UI        = 0x55
 CMD_SCREEN    = 0x56
 CMD_ROLL      = 0x57
 CMD_GEN       = 0x58
+CMD_CFG       = 0x59
 CMD_EXT_INFO  = 0x5F
 RESP_READ_MEM = 0x43
 RESP_ERROR    = 0x7E          # 0x7e cmd code

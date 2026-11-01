@@ -52,10 +52,11 @@ tc3-scpi = "tc3scpi:main"
 tc3-sr = "tc3_sr:main"
 tc3-cal = "tc3_cal:main"
 tc3-shots = "tc3_shots:main"
+tc3-mtcal = "tc3_mtcal:main"
 
 [tool.setuptools]
 package-dir = {"" = "host"}
-py-modules = ["tc3_client", "tc3_scpi", "tc3_sr", "tc3_cal", "tc3_shots"]
+py-modules = ["tc3_client", "tc3_scpi", "tc3_sr", "tc3_cal", "tc3_shots", "tc3_mtcal"]
 
 [tool.setuptools.packages.find]
 where = ["host"]
