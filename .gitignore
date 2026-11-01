@@ -1,0 +1,14 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# firmware_ext build output (regenerate with `make` in firmware_ext/)
+firmware_ext/build/
+
+# Toolchain local symlinks
+firmware_ext/tools/toolchain/
+
