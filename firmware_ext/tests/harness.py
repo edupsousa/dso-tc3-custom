@@ -1,5 +1,9 @@
 """Unicorn harness for the offline firmware tests.
-Run tests from the repository root."""
+Run tests from the repository root.
+
+Optional environment, for a richer emulated device than the defaults:
+  TC3_FLASH_BASE     full 512 KB flash dump to start from (default: blank flash)
+  TC3_SRAM_SNAPSHOT  128 KB SRAM snapshot of a running scope (default: a minimal synthetic state)"""
 import os
 import shutil
 import struct
@@ -13,7 +17,7 @@ NM = local_nm if (os.path.isfile(local_nm) and os.access(local_nm, os.X_OK)) els
 syms = {l.split()[2]: int(l.split()[0], 16) for l in
         subprocess.check_output([NM, 'firmware_ext/build/extension.elf'], text=True).splitlines() if len(l.split()) == 3}
 
-flash = bytearray(0x80000)
+flash = bytearray(open(os.environ['TC3_FLASH_BASE'], 'rb').read() if os.environ.get('TC3_FLASH_BASE') else 0x80000)
 HAS_PAYLOAD = False
 
 # Load flash from available build artifact
@@ -50,7 +54,7 @@ s = bytearray(0x20000)
 s[0x668 + 0x20] = 3
 s[0x668 + 0x28] = 7
 s[0x668 + 0x34] = 1
-sram = bytes(s)
+sram = open(os.environ['TC3_SRAM_SNAPSHOT'], 'rb').read() if os.environ.get('TC3_SRAM_SNAPSHOT') else bytes(s)
 
 REQ = 0x20100000          # scratch RAM for requests
 SENTINEL = 0x08079000     # return address: emulation stops here
