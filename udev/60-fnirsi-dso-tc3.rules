@@ -1,0 +1,16 @@
+# FNIRSI DSO-TC3 Oscilloscope & Transistor Tester
+#
+# Grants access to unprivileged users (uaccess / dialout / plugdev) and
+# prevents ModemManager from probing and sending AT commands to the device.
+#
+# Installation:
+#   sudo cp 60-fnirsi-dso-tc3.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# DSO-TC3 Application & Bootloader CDC serial (VID:PID 19f5:5740)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="19f5", ATTRS{idProduct}=="5740", MODE="0666", GROUP="dialout", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="19f5", ATTRS{idProduct}=="5740", MODE="0666", GROUP="plugdev", TAG+="uaccess"
+
+# CH340 USB-UART bridge (VID:PID 1a86:7523)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666", GROUP="dialout", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666", GROUP="plugdev", TAG+="uaccess"
